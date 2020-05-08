@@ -17,6 +17,7 @@ class UsersRepository {
     }
   }
 
+  // Reads and gets the file records
   async getAll(){
     // use a promise whenever possible
     // open the file called this.filename, Parse the contents
@@ -27,15 +28,27 @@ class UsersRepository {
       })
     );
   }
+
+  // Create a record of users
+  async create(attrs) {
+    // Load data up for the most recent data available
+    const records = await this.getAll();
+    records.push(attrs);
+
+    // Write records to file
+    await fs.promises.writeFile(this.filename, JSON.stringify(records));
+  }
 }
 
 
 const test = async () => {
   const repo = new UsersRepository("users.json");
 
+  await repo.create({email: "test@test.com", password: "password"});
+
   const users = await repo.getAll();
 
-  console.log(users)
+  console.log(users);
 }
 
 test();
