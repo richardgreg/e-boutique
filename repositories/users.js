@@ -1,4 +1,5 @@
-const fs = require('fs');
+const fs = require("fs"); // For file manipulation
+const crypto = require("crypto"); // For generating random ID
 
 
 class UsersRepository {
@@ -31,6 +32,8 @@ class UsersRepository {
 
   // Create a record of users
   async create(attrs) {
+    attrs.id = this.randomId()
+    
     // Load data up for the most recent data available
     const records = await this.getAll();
     records.push(attrs);
@@ -46,6 +49,12 @@ class UsersRepository {
       JSON.stringify(records, null, 2)
     );
   }
+
+  // generate a random set of Id
+  randomId() {
+    return crypto.randomBytes(4).toString("hex");
+  }
+
 }
 
 
