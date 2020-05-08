@@ -33,7 +33,7 @@ class UsersRepository {
   // Create a record of users
   async create(attrs) {
     attrs.id = this.randomId()
-    
+
     // Load data up for the most recent data available
     const records = await this.getAll();
     records.push(attrs);
@@ -55,17 +55,25 @@ class UsersRepository {
     return crypto.randomBytes(4).toString("hex");
   }
 
+  async getOne(id) {
+    const records = await this.getAll()
+    return records.find(record => record.id === id);
+  }
+
 }
 
 
 const test = async () => {
   const repo = new UsersRepository("users.json");
 
-  await repo.create({email: "test@test.com", password: "password"});
+  // await repo.create({email: "trent@test.com", password: "password"});
 
-  const users = await repo.getAll();
+  //const users = await repo.getAll();
 
-  console.log(users);
+  const user = await repo.getOne("06e6877c");
+  console.log(user);
+
+  // console.log(users);
 }
 
 test();
