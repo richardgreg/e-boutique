@@ -39,6 +39,8 @@ class UsersRepository {
     records.push(attrs);
 
     await this.writeAll(records);
+
+    return attrs;
   }
 
   // Write all users to json file
