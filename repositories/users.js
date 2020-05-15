@@ -64,6 +64,17 @@ class UsersRepository {
     return record;
   }
 
+  async comparePasswords(saved, supplied){
+    // const result = saved.split('.');
+    // const hashed = result[0];
+    // const salt = result[1];
+
+    const [hashed, salt] = saved.split(".");
+    const hashedSupplied = await scrypt(supplied, salt, 64);
+
+    return hashed === hashedSupplied.toString("hex");
+  }
+
   // Write all users to json file
   async writeAll(records) {
     // Write records to JSON file
