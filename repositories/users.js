@@ -1,5 +1,9 @@
 const fs = require("fs"); // For file manipulation
 const crypto = require("crypto"); // For generating random ID
+const util = require("util");
+
+// Use the util module to turn scrypt into an async-await fxn that returns a promise
+const scrypt = util.promisify(crypto.scrypt);
 
 
 class UsersRepository {
@@ -32,15 +36,32 @@ class UsersRepository {
 
   // Create a record of users
   async create(attrs) {
+    // attrs === {email, password}
     attrs.id = this.randomId()
 
+    // Random salt for appending to password
+    const salt = crypto.randomBytes(8).toString("hex");
+
+    // Hash password
+    const hashedPassword = await scrypt(attrs.password, salt, 64);
+
+    // Call back method for hasing a password
+    // scrypt(attrs.password, salt, 64, (err, derivedKey) => {
+    //   const hashed = derivedKey.toString("hex");
+    // });
+
     // Load data up for the most recent data available
+    // Prepare the record and push to records
     const records = await this.getAll();
-    records.push(attrs);
+    const record = {
+      ...attrs,
+      password: `${hashedPassword.toString("hex")}.${salt}`
+    };
+    records.push(record);
 
     await this.writeAll(records);
 
-    return attrs;
+    return record;
   }
 
   // Write all users to json file
