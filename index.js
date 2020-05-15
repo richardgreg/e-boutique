@@ -7,9 +7,11 @@ const app = express();
 
 // Express should automatically use middleware in requests
 app.use(bodyParser.urlencoded({extended: true}));
+// For storing user session
 app.use(cookieSession({
   keys:["randomStringOfCharacters"]
 }));
+
 
 app.get('/signup', (req, res) => {
   res.send(`
@@ -39,11 +41,11 @@ app.post('/signup', async (req, res) => {
   }
 
   // Create a user in our repo to represent the person
-  const user = await userRepo.create({email, password});
+  const newUser = await userRepo.create({email, password});
 
   // Store the id of that user inside the users cookie
-  // Cookie session object added to req head by cookie-sesion library
-  req.session.userId = user.id;
+  // Cookie session object added to req head by cookie-session library
+  req.session.userId = newUser.id;
 
   res.send('Account created!!!');
 });
@@ -82,6 +84,7 @@ req.session.userId = user.id;
 
 res.send("You are signed in");
 });
+
 
 app.listen(3000, () => {
   console.log('Listening');
