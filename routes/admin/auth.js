@@ -1,5 +1,5 @@
 const express = require("express");
-const {check, validationResult} = require("express-validator");
+const {validationResult} = require("express-validator");
 
 const userRepo = require("../../repositories/users");
 const signupTemplate = require("../../views/admin/auth/signup");
@@ -7,7 +7,9 @@ const signinTemplate = require("../../views/admin/auth/signin");
 const {
   requireEmali,
   requirePassword,
-  requirePasswordComfirmation
+  requirePasswordComfirmation,
+  requireEmaliExists,
+  requireValidPasswordForUser
 } = require("./validators");
 
 // A sub-router for routing endpoints in-app
@@ -54,23 +56,21 @@ router.get("/signin", (req, res) => {
   res.send(signinTemplate());
 });
 
-router.post("/signin", async (req, res) => {
+router.post("/signin",[
+  requireEmaliExists,
+  requireValidPasswordForUser
+],
+  async (req, res) => {
+  // Pass information from request body to valdationResult
+  const errors = validationResult(req);
+  console.log(errors);
+  // if (!errors.isEmpty()) {
+  //   return res.send(signinTemplate({ req, errors }));
+  // };
   // Get user info from request body
-  const { email, password } = req.body;
+  const { email } = req.body;
 
   const user = await userRepo.getOneBy({ email });
-
-  if (!user) {
-    return res.send("Email not found");
-  }
-
-  const validPassword = await userRepo.comparePasswords(
-    user.password,
-    password
-  );
-  if (!validPassword) {
-    return res.send("Invalid Password");
-  }
 
   req.session.userId = user.id;
 

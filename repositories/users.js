@@ -137,5 +137,5 @@ class UsersRepository {
   }
 }
 
-// Expor an insdtance of the class
+// Export an insdtance of the class
 module.exports = new UsersRepository("users.json");
