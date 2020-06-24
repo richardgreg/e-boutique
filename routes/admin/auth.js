@@ -53,7 +53,7 @@ router.get("/signout", (req, res) => {
 });
 
 router.get("/signin", (req, res) => {
-  res.send(signinTemplate());
+  res.send(signinTemplate({}));
 });
 
 router.post("/signin",[
@@ -63,10 +63,11 @@ router.post("/signin",[
   async (req, res) => {
   // Pass information from request body to valdationResult
   const errors = validationResult(req);
-  console.log(errors);
-  // if (!errors.isEmpty()) {
-  //   return res.send(signinTemplate({ req, errors }));
-  // };
+
+  if (!errors.isEmpty()) {
+    return res.send(signinTemplate({ errors }));
+  };
+
   // Get user info from request body
   const { email } = req.body;
 
