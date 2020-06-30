@@ -1,6 +1,6 @@
 const express = require("express");
-const {validationResult} = require("express-validator");
 
+const {handleErrors} = require("./middleware");
 const userRepo = require("../../repositories/users");
 const signupTemplate = require("../../views/admin/auth/signup");
 const signinTemplate = require("../../views/admin/auth/signin");
@@ -26,15 +26,10 @@ router.post(
     requirePassword,
     requirePasswordComfirmation,
   ],
+  handleErrors(signupTemplate),
   async (req, res) => {
-    // Pass information from request body to valdationResult
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.send(signupTemplate({req, errors}));
-    };
-
     // Get user repository from request body and see if it exists
-    const { email, password, passwordConfirmation } = req.body;
+    const { email, password } = req.body;
 
     // Create a user in our repo to represent the person
     const newUser = await userRepo.create({ email, password });
@@ -60,14 +55,8 @@ router.post("/signin",[
   requireEmaliExists,
   requireValidPasswordForUser
 ],
+handleErrors(signinTemplate),
   async (req, res) => {
-  // Pass information from request body to valdationResult
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    return res.send(signinTemplate({ errors }));
-  };
-
   // Get user info from request body
   const { email } = req.body;
 
